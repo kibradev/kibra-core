@@ -21,7 +21,7 @@ end
 KIBRA.CreateCallback('Kibra:Core:Server:RequestPlayerName', function(source, cb)
     local Player = KIBRA.SourceFromPlayer(source)
     if Player then 
-        cb(Player.getName())
+        cb(Player.GetPlayerName())
     else
         cb(false)
     end
@@ -92,7 +92,23 @@ KIBRA.VIP = function(ThePlayer)
             return ThePlayer.PlayerData.money[type]
         end
     end
-        
+
+    Self.SetJob = function(job, grade)
+        if Config.Framework == "ESX" then
+            ThePlayer.setJob(job, grade)
+        else
+            ThePlayer.Functions.SetJob(job, grade)
+        end
+    end  
+
+    Self.GetJob = function()
+        if Config.Framework == "ESX" then
+            return ThePlayer.job.name
+        else
+            return ThePlayer.PlayerData.job.name
+        end
+    end
+
     return KIBRA.Consubstantiate(Self, ThePlayer)
 end
 
@@ -103,6 +119,18 @@ KIBRA.AllPlayers = function()
         return QBCore.Functions.GetPlayers()
     end
 end
+
+KIBRA.CreateCallback('kibra:Core:GetJobs', function(source, cb, job)
+    if Config.Framework == "ESX" then
+        local MysqlMechanic = MySQL.Sync.fetchAll('SELECT * FROM users WHERE job = @job', {["@job"] = job})
+        for k,v in pairs(MysqlMechanic) do
+            tableV = {}
+            table.insert(tableV, {identifier = v.identifier, name = v.firstname.. ' '..v.lastname, permission = v.job_grade})
+        end
+        print(KIBRA.DumpTable(tableV))
+        cb(tableV)
+    end
+end)
 
 KIBRA.GetIdentifierFromPlayer  = function(identifier)
     if Config.Framework == "ESX" then

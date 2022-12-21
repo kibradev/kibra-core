@@ -40,6 +40,12 @@ KIBRA.DrawMarker = function(type, coord, distance)
     end
 end
 
+KIBRA.GetJobsAllPlayers = function(job)
+    KIBRA.TriggerCallback('kibra:Core:GetJobs', function(export)
+        return export
+    end, job)
+end
+
 KIBRA.GetVehicleInDirection = function()
     local playerPed = PlayerPedId()
     local playerCoords = GetEntityCoords(playerPed)
@@ -73,13 +79,19 @@ KIBRA.GetPlayerData = function()
         PlayerData = ESX.GetPlayerData()
         PlayerData.identifier = PlayerData.identifier
         PlayerData.PlayerName = PlayerName
+        PlayerData.JobName = PlayerData.job.name
     else
         PlayerData = QBCore.Functions.GetPlayerData()
         PlayerData.identifier = PlayerData.citizenid
         PlayerData.PlayerName = PlayerData.charinfo.firstname.. ' '..PlayerData.charinfo.lastname
+        PlayerData.JobName = PlayerData.job.name
     end
     return PlayerData
 end
+
+-- RegisterNetEvent(Config.JobEvents[Config.Framework], function(job)
+--     KIBRA.GetPlayerData().job = job
+-- end)
 
 KIBRA.Trim = function(value)
     if not value then return nil end
