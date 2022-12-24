@@ -10,6 +10,20 @@ RegisterNetEvent(Config.Events[Config.Framework], function()
     end)
 end)
 
+RegisterNetEvent(Config.JobEvents[Config.Framework], function(job)
+    KIBRA.GetPlayerData().job = job
+end)
+
+KIBRA.Notify = function(text, type)
+    if Config.Framework == "ESX" then
+        ESX.ShowNotification(text)
+    else
+        QBCore.Functions.Notify(text, type)
+    end
+end
+
+RegisterNetEvent('kibra:Core:Notify', KIBRA.Notify)
+
 KIBRA.TriggerCallback = function(name, cb, ...)
     KIBRA.ServerCallbacks[name] = cb
     TriggerServerEvent('KIBRA:Server:TriggerCallback', name, ...)
@@ -38,6 +52,39 @@ KIBRA.DrawMarker = function(type, coord, distance)
     if getDistance <= distance then
         DrawMarker(type, coord.x, coord.y, coord.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, Config.DrawMarkerRGBAColor[1], Config.DrawMarkerRGBAColor[2], Config.DrawMarkerRGBAColor[3], Config.DrawMarkerRGBAColor[4], false, false, false, 1, false, false, false)
     end
+end
+
+KIBRA.GetVehiclesInArea = function(coords, maxDistance)
+    return EnumerateEntitiesWithinDistance(KIBRA.GetVehicles(), false, coords, maxDistance)
+end
+
+function KIBRA.GetVehicles() -- Leave the function for compatibility
+    return GetGamePool('CVehicle')
+end
+
+function EnumerateEntitiesWithinDistance(entities, isPlayerEntities, coords, maxDistance)
+    local nearbyEntities = {}
+
+    if coords then
+        coords = vector3(coords.x, coords.y, coords.z)
+    else
+        local playerPed = PlayerPedId()
+        coords = GetEntityCoords(playerPed)
+    end
+
+    for k, entity in pairs(entities) do
+        local distance = #(coords - GetEntityCoords(entity))
+
+        if distance <= maxDistance then
+            nearbyEntities[#nearbyEntities + 1] = isPlayerEntities and k or entity
+        end
+    end
+
+    return nearbyEntities
+end
+
+KIBRA.IsSpawnPointClear = function(coords, maxDistance)
+    return #KIBRA.GetVehiclesInArea(coords, maxDistance) == 0
 end
 
 KIBRA.GetJobsAllPlayers = function(job)
@@ -88,10 +135,6 @@ KIBRA.GetPlayerData = function()
     end
     return PlayerData
 end
-
--- RegisterNetEvent(Config.JobEvents[Config.Framework], function(job)
---     KIBRA.GetPlayerData().job = job
--- end)
 
 KIBRA.Trim = function(value)
     if not value then return nil end

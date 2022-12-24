@@ -10,6 +10,10 @@ exports("GetKibraCore", function()
     return KIBRA
 end)
 
+exports('GetSetJobEvent', function()
+    return Config.JobEvents[Config.Framework]
+end)
+
 exports('MySQLTableName', function()
     if Config.Framework == "ESX" then
         Memati = {"owned_vehicles", "vehicles"}

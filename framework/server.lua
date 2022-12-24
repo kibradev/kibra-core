@@ -127,7 +127,6 @@ KIBRA.CreateCallback('kibra:Core:GetJobs', function(source, cb, job)
             tableV = {}
             table.insert(tableV, {identifier = v.identifier, name = v.firstname.. ' '..v.lastname, permission = v.job_grade})
         end
-        print(KIBRA.DumpTable(tableV))
         cb(tableV)
     end
 end)
@@ -157,6 +156,7 @@ KIBRA.SourceFromPlayer = function(source)
         if not ThePlayer then return end
         ThePlayer.identifier = ThePlayer.PlayerData.citizenid
         ThePlayer.source = ThePlayer.PlayerData.source
+        ThePlayer.phone = ThePlayer.PlayerData.charinfo.phone
     end
     ThePlayer = KIBRA.VIP(ThePlayer)
     return ThePlayer
