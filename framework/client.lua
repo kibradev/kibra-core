@@ -11,7 +11,11 @@ RegisterNetEvent(Config.Events[Config.Framework], function()
 end)
 
 RegisterNetEvent(Config.JobEvents[Config.Framework], function(job)
-    KIBRA.GetPlayerData().job = job
+    if Config.Framework == "ESX" then
+        ESX.GetPlayerData().job = job
+    else
+        QBCore.Functions.GetPlayerData().job = job
+    end
 end)
 
 KIBRA.Notify = function(text, type)
@@ -54,10 +58,6 @@ KIBRA.DrawMarker = function(type, coord, distance)
     end
 end
 
-KIBRA.GetVehiclesInArea = function(coords, maxDistance)
-    return EnumerateEntitiesWithinDistance(KIBRA.GetVehicles(), false, coords, maxDistance)
-end
-
 function KIBRA.GetVehicles() -- Leave the function for compatibility
     return GetGamePool('CVehicle')
 end
@@ -81,16 +81,6 @@ function EnumerateEntitiesWithinDistance(entities, isPlayerEntities, coords, max
     end
 
     return nearbyEntities
-end
-
-KIBRA.IsSpawnPointClear = function(coords, maxDistance)
-    return #KIBRA.GetVehiclesInArea(coords, maxDistance) == 0
-end
-
-KIBRA.GetJobsAllPlayers = function(job)
-    KIBRA.TriggerCallback('kibra:Core:GetJobs', function(export)
-        return export
-    end, job)
 end
 
 KIBRA.GetVehicleInDirection = function()
@@ -126,12 +116,11 @@ KIBRA.GetPlayerData = function()
         PlayerData = ESX.GetPlayerData()
         PlayerData.identifier = PlayerData.identifier
         PlayerData.PlayerName = PlayerName
-        PlayerData.JobName = PlayerData.job.name
     else
         PlayerData = QBCore.Functions.GetPlayerData()
         PlayerData.identifier = PlayerData.citizenid
         PlayerData.PlayerName = PlayerData.charinfo.firstname.. ' '..PlayerData.charinfo.lastname
-        PlayerData.JobName = PlayerData.job.name
+        PlayerData.job_grade = PlayerData.job.grade.name
     end
     return PlayerData
 end
@@ -665,4 +654,26 @@ KIBRA.DumpTable = function(table, nb)
 	else
 		return tostring(table)
 	end
+end
+
+KIBRA.AllVehicles = function()
+    return GetGamePool('CVehicle')
+end
+
+function KIBRA.GetVehiclesInArea(coords, maxDistance)
+    return EnumerateEntitiesWithinDistance(KIBRA.AllVehicles(), false, coords, maxDistance)
+end
+
+function KIBRA.IsSpawnPointClear(coords, maxDistance)
+    return #KIBRA.GetVehiclesInArea(coords, maxDistance) == 0
+end
+
+function KIBRA.GetAvailableVehicleSpawnPoint(coords)
+	local found = false
+
+    if KIBRA.IsSpawnPointClear(coords, 10.0) then
+        found = true
+    end
+
+	return found
 end

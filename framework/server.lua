@@ -120,22 +120,11 @@ KIBRA.AllPlayers = function()
     end
 end
 
-KIBRA.CreateCallback('kibra:Core:GetJobs', function(source, cb, job)
-    if Config.Framework == "ESX" then
-        local MysqlMechanic = MySQL.Sync.fetchAll('SELECT * FROM users WHERE job = @job', {["@job"] = job})
-        for k,v in pairs(MysqlMechanic) do
-            tableV = {}
-            table.insert(tableV, {identifier = v.identifier, name = v.firstname.. ' '..v.lastname, permission = v.job_grade})
-        end
-        cb(tableV)
-    end
-end)
-
 KIBRA.GetIdentifierFromPlayer  = function(identifier)
     if Config.Framework == "ESX" then
-        return ESX.GetPlayerFromIdentifier(identifier)
+        return ESX.GetPlayerFromIdentifier(identifier).source
     else
-        return QBCore.Functions.GetPlayerByCitizenId(identifier)
+        return QBCore.Functions.GetPlayerByCitizenId(identifier).PlayerData.source
     end
 end
 
@@ -225,4 +214,50 @@ AddEventHandler('Kibra:Core:PlayerInGame', function()
         PlayerName = info.GetPlayerName()
     end
     TriggerClientEvent('Kibra:Core:PlayerInGame', source, source)
+end)
+
+JobGradeNoToName = function(grade, job)
+    local v = MySQL.Sync.fetchAll('SELECT * FROM job_grades WHERE grade = @g AND job_name = @j', {["@g"] = grade, ["@j"] = job})
+    if #v ~= 0 then
+        return v[1].label
+    end
+end
+
+KIBRA.SetJobSQL = function(job, grade, identifier)
+    if Config.Framework == "ESX" then
+        MySQL.Async.execute('UPDATE `users` SET `job` = @job, `job_grade` = @grade WHERE `identifier` = @id', {
+            ["@id"] = identifier,
+            ["@job"] = job,
+            ["@grade"] = grade
+        })
+    else
+        local getData = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = @id', {["@id"] = identifier})
+        local data = json.decode(getData[1].job)
+        data.name = job
+        data.grade.level = grade 
+        MySQL.Async.execute('UPDATE players SET job = @job WHERE citizenid = @id', {["@id"] = identifier, ["@job"] = json.encode(data)})
+    end
+end
+
+RegisterNetEvent('kibra:SetEmployees', function(job)
+    local src = source 
+    local emp = {}
+    local mysql = ""
+    if Config.Framework == "ESX" then
+        mysql = MySQL.Sync.fetchAll('SELECT * FROM users WHERE job = @job', {["@job"] = job})
+        MySQL.Sync.fetchAll('SELECT * FROM users WHERE job = @job', {["@job"] = job})
+        for k,v in pairs(mysql) do
+            table.insert(emp, {identifier = v.identifier, name = v.firstname..' '..v.lastname, permission = JobGradeNoToName(v.job_grade, v.job)})
+        end
+    else
+        local cData = MySQL.Sync.fetchAll('SELECT * FROM players')
+        for k,v in pairs(cData) do
+            local jobr = json.decode(v.job)
+            local playerdata = json.decode(v.charinfo)
+            if jobr.name == job then
+                table.insert(emp, {identifier = v.citizenid, name = playerdata.firstname..' '..playerdata.lastname, permission = jobr.label})
+            end
+        end
+    end
+    TriggerClientEvent('kibra:TabloUpdate', src, emp)
 end)

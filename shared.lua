@@ -10,13 +10,18 @@ exports("GetKibraCore", function()
     return KIBRA
 end)
 
-exports('GetSetJobEvent', function()
-    return Config.JobEvents[Config.Framework]
+exports('GetFramework', function()
+    return Config.Framework
+end)
+
+exports('GetEvents', function()
+    local v = {Config.JobEvents[Config.Framework], Config.Events[Config.Framework]}
+    return v
 end)
 
 exports('MySQLTableName', function()
     if Config.Framework == "ESX" then
-        Memati = {"owned_vehicles", "vehicles"}
+        Memati = {"owned_vehicles", "vehicle"}
         return Memati
     else
         Memati = {"player_vehicles", "mods"}
