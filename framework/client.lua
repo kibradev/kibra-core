@@ -1,22 +1,58 @@
 KIBRA = {}
 KIBRA.ServerCallbacks = {}
-local PlayerName = nil 
+pData = {}
 
-RegisterNetEvent(Config.Events[Config.Framework], function()
-    KIBRA.TriggerCallback('Kibra:Core:Server:RequestPlayerName', function(export)
-        if export then
-            PlayerName = export
-        end
-    end)
-end)
-
-RegisterNetEvent(Config.JobEvents[Config.Framework], function(job)
-    if Config.Framework == "ESX" then
-        ESX.GetPlayerData().job = job
+AddEventHandler(Config.Events[Config.Framework], function()
+    if Config.Framework == "QBCore" then
+        pData = QBCore.Functions.GetPlayerData()
     else
-        QBCore.Functions.GetPlayerData().job = job
+        pData = ESX.GetPlayerData()
     end
 end)
+
+
+RegisterNetEvent(Config.JobEvents[Config.Framework], function(Job)
+    pData.job = Job
+end)
+
+KIBRA.GetPlayerData = function()
+    if Config.Framework == "QBCore" then
+        PlayerData = QBCore.Functions.GetPlayerData()
+    else
+        PlayerData = ESX.GetPlayerData()
+    end
+    return PlayerData
+end
+
+KIBRA.NewGetPlayerData = function(type)
+    if Config.Framework == "QBCore" then
+        if type == "identifier" then
+            return pData.citizenid
+        elseif type == "jobName" then
+            if pData.job then
+                return pData.job.name
+            end
+        elseif type == "jobName" then
+            if pData.job then
+                return pData.job.grade.level
+            end
+        end
+    else
+        if type == "identifier" then
+            return pData.identifier
+        elseif type == "jobName" then
+            if pData.job then
+                return pData.job.name
+            end
+        elseif type == "jobName" then
+            if pData.job then
+                return pData.job.grade
+            end
+        elseif type == "inventory" then
+            return pData.inventory
+        end
+    end
+end
 
 KIBRA.Notify = function(text, type)
     if Config.Framework == "ESX" then
@@ -32,10 +68,6 @@ KIBRA.TriggerCallback = function(name, cb, ...)
     KIBRA.ServerCallbacks[name] = cb
     TriggerServerEvent('KIBRA:Server:TriggerCallback', name, ...)
 end
-
-RegisterNetEvent(Config.Events[Config.Framework], function()
-    TriggerServerEvent('Kibra:Core:PlayerInGame')
-end)
 
 AddEventHandler('onResourceStart', function(resourceName)
 	if (GetCurrentResourceName() ~= resourceName) then
@@ -109,20 +141,6 @@ KIBRA.GetServerPlayers = function()
         end
     end    
     return AllPlayers
-end
-
-KIBRA.GetPlayerData = function()
-    if Config.Framework == "ESX" then
-        PlayerData = ESX.GetPlayerData()
-        PlayerData.identifier = PlayerData.identifier
-        PlayerData.PlayerName = PlayerName
-    else
-        PlayerData = QBCore.Functions.GetPlayerData()
-        PlayerData.identifier = PlayerData.citizenid
-        PlayerData.PlayerName = PlayerData.charinfo.firstname.. ' '..PlayerData.charinfo.lastname
-        PlayerData.job_grade = PlayerData.job.grade.name
-    end
-    return PlayerData
 end
 
 KIBRA.Trim = function(value)

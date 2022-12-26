@@ -8,8 +8,8 @@ version "1.0.0"
 
 description "Created by Kibra for Kibra Resources"
 
-client_script "framework/client.lua"
+client_scripts {"shared.lua","framework/client.lua"}
 
-server_scripts {"@mysql-async/lib/MySQL.lua", "framework/server.lua"}
+server_scripts {"shared.lua","@mysql-async/lib/MySQL.lua", "framework/server.lua"}
 
 shared_scripts {"config.lua", "shared.lua"}
