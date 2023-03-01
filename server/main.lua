@@ -45,29 +45,11 @@ function KIBRA.Natives.SourceFromPlayer(source)
         if not vPlayer then return end 
         vPlayer.identifier = vPlayer.PlayerData.citizenid
         vPlayer.source = vPlayer.PlayerData.source
+        vPlayer.job.grade_name = vPlayer.job.grade.name
     end
     vPlayer = KIBRA.Natives.TableUpdate(vPlayer)
     return vPlayer
 end
-
-AddEventHandler('playerConnecting', function(name, setKickReason, deferrals)
-    -- Log message when a player connects
-    print("Player " .. name .. " connected to the server.")
-    
-    -- Get player information and store it in a table
-    local player = {}
-    player.name = name
-    player.id = source
-    player.ip = GetPlayerEndpoint(source)
-    
-    -- Print player information to console
-    print("Player information:")
-    print("Name: " .. player.name)
-    print("ID: " .. player.id)
-    print("IP: " .. player.ip)
-end)
-
-
 
 KIBRA.Natives.MergeTable = function(t1, t2)
     if not t2 then return end
@@ -189,6 +171,23 @@ KIBRA.Natives.SetJobSQL = function(job, grade, identifier)
         data.grade.level = grade 
         MySQL.Async.execute('UPDATE players SET job = @job WHERE citizenid = @id', {["@id"] = identifier, ["@job"] = json.encode(data)})
     end
+end
+
+function KIBRA.Natives.HasPermission(source, perm) 
+    local vPlayer = KIBRA.Natives.SourceFromPlayer(source)
+    local framework = Shared.Framework
+    local check = false 
+    if framework == "QBCore" then
+        if perm == "admin" then perm = "god" end
+        if vPlayer.Functions.HasPermission(perm) then
+            check = true
+        end
+    else
+        if vPlayer.getGroup() == perm then
+            check = true
+        end
+    end
+    return check
 end
 
 function KIBRA.Natives.GetPlayerFromIdentifier(identifier)
