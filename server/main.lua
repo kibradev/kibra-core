@@ -45,6 +45,7 @@ function KIBRA.Natives.SourceFromPlayer(source)
         if not vPlayer then return end 
         vPlayer.identifier = vPlayer.PlayerData.citizenid
         vPlayer.source = vPlayer.PlayerData.source
+	vPlayer.job = vPlayer.PlayerData.job
         vPlayer.job.grade_name = vPlayer.job.grade.name
     end
     vPlayer = KIBRA.Natives.TableUpdate(vPlayer)
