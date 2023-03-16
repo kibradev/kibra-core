@@ -4,15 +4,14 @@ KIBRA.PlayerData = {}
 KIBRA.ServerCallbacks = {}
 KIBRA.Natives.UI = {}
 KIBRA.CurrentRequestId = 0 
+local playerData = {}
 
 function KIBRA.Natives.GetPlayerData()
-    local playerData = {}
 
     if Shared.Framework == "ESX" then
         playerData = Framework.GetPlayerData()
     else
         playerData = Framework.Functions.GetPlayerData()
-        playerData.name = playerData.charinfo.firstname..' '..playerData.charinfo.lastname
         playerData.identifier = playerData.citizenid
     end
 
