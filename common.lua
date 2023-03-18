@@ -9,3 +9,7 @@ end
 exports('GetCore', function()
     return KIBRA
 end)
+
+exports('GetFramework', function()
+    return Shared.Framework
+end)
