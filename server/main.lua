@@ -44,8 +44,9 @@ function KIBRA.Natives.SourceFromPlayer(source)
         vPlayer = Framework.Functions.GetPlayer(src)
         if not vPlayer then return end 
         vPlayer.identifier = vPlayer.PlayerData.citizenid
+        vPlayer.license = vPlayer.PlayerData.license
         vPlayer.source = vPlayer.PlayerData.source
-	vPlayer.job = vPlayer.PlayerData.job
+        vPlayer.job = vPlayer.PlayerData.job
         vPlayer.job.grade_name = vPlayer.job.grade.name
     end
     vPlayer = KIBRA.Natives.TableUpdate(vPlayer)
@@ -116,11 +117,11 @@ function KIBRA.Natives.TableUpdate(vPlayer)
         end
     end
 
-    xPlayer.addItem = function(item, amount)
+    xPlayer.addItem = function(item, amount, slot, metadata)
         if framework == "ESX" then
-            vPlayer.addInventoryItem(item, amount)
+            vPlayer.addInventoryItem(item, amount, metadata)
         else
-            vPlayer.Functions.AddItem(item, amount)
+            vPlayer.Functions.AddItem(item, amount, slot, metadata)
         end
     end
 
