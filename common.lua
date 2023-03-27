@@ -1,9 +1,11 @@
 Framework = nil 
 
-if Shared.Framework == "ESX" then
-    Framework = exports["es_extended"]:getSharedObject()
-else
-    Framework = exports["qb-core"]:GetCoreObject()
+if not Shared.OldFramework then
+    if Shared.Framework == "ESX" then
+        Framework = exports["es_extended"]:getSharedObject()
+    else
+        Framework = exports["qb-core"]:GetCoreObject()
+    end 
 end
 
 exports('GetCore', function()
