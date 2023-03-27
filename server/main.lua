@@ -3,8 +3,22 @@ KIBRA.Natives = {}
 KIBRA.Players = {}
 KIBRA.ServerCallbacks = {}
 
+if Shared.OldFramework then
+    if Shared.Framework == "ESX" then
+        Framework = nil
+        TriggerEvent('esx:getSharedObject', function(obj) Framework = obj end)
+    else
+        Framework = nil
+        TriggerEvent('QBCore:GetObject', function(obj) Framework = obj end)
+    end
+end
+
 function KIBRA.Natives.CreateCallback(name, cb)
     KIBRA.ServerCallbacks[name] = cb
+end
+
+function KIBRA.Natives.GetOld()
+    return Shared.OldFramework
 end
 
 function KIBRA.Natives.TriggerCallback(name, requestId, source, Invoke, cb, ...)
@@ -47,6 +61,7 @@ function KIBRA.Natives.SourceFromPlayer(source)
         vPlayer.license = vPlayer.PlayerData.license
         vPlayer.source = vPlayer.PlayerData.source
         vPlayer.job = vPlayer.PlayerData.job
+        vPlayer.job.name = vPlayer.PlayerData.job.name
         vPlayer.job.grade_name = vPlayer.job.grade.name
     end
     vPlayer = KIBRA.Natives.TableUpdate(vPlayer)
