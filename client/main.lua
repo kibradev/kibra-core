@@ -6,6 +6,24 @@ KIBRA.Natives.UI = {}
 KIBRA.CurrentRequestId = 0 
 local playerData = {}
 
+if Shared.OldFramework then
+    if Shared.Framework == "ESX" then
+        Citizen.CreateThread(function()
+            while Framework == nil do
+                TriggerEvent('esx:getSharedObject', function(obj) Framework = obj end)
+                Citizen.Wait(5000)
+            end
+        end)
+    else
+        Citizen.CreateThread(function()
+            while Framework == nil do
+                TriggerEvent('QBCore:GetObject', function(obj) Framework = obj end)
+                Citizen.Wait(5000)
+            end
+        end)
+    end
+end
+
 function KIBRA.Natives.GetPlayerData()
 
     if Shared.Framework == "ESX" then
@@ -36,35 +54,23 @@ function KIBRA.Natives.UI.Hide()
     })
 end
 
-function KIBRA.GetEvents()
-    local Events = {
-        ['playerLoaded'] = Shared.Events[Shared.Framework][1],
-        ['playerJobUpdate'] = Shared.Events[Shared.Framework][2],
-        ['playerLogout'] = Shared.Events[Shared.Framework][3]
-    }
-    return Events
-end
-
-RegisterNetEvent(Shared.Events[Shared.Framework][1])
-AddEventHandler(Shared.Events[Shared.Framework][1], function(xPlayer, isNew)
-	KIBRA.PlayerData = xPlayer
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function(xPlayer)
+    KIBRA.PlayerData = xPlayer
 	KIBRA.PlayerLoaded = true
 end)
 
-RegisterNetEvent(Shared.Events[Shared.Framework][3]) 
-AddEventHandler(Shared.Events[Shared.Framework][3], function()
+AddEventHandler('esx:playerLoaded', function(xPlayer)
 	KIBRA.PlayerLoaded = false
-	KIBRA.PlayerData = {}
+	KIBRA.PlayerData = xPlayer
 end)
 
-RegisterNetEvent(Shared.Events[Shared.Framework][2])
-AddEventHandler(Shared.Events[Shared.Framework][2], function(job)
+AddEventHandler("esx:setJob", function(job)
 	KIBRA.PlayerData.job = job
 end)
 
-AddEventHandler(Shared.Events[Shared.Framework][1], function(vPlayer)
-    KIBRA.PlayerData = vPlayer
-end) 
+AddEventHandler("QBCore:Client:OnJobUpdate", function(job)
+	KIBRA.PlayerData.job = job
+end)
 
 RegisterNetEvent('kibra:serverCallback', function(requestId,invoker, ...)
     if KIBRA.ServerCallbacks[requestId] then
