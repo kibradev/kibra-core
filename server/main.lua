@@ -3,15 +3,30 @@ KIBRA.Natives = {}
 KIBRA.Players = {}
 KIBRA.ServerCallbacks = {}
 
-if Shared.OldFramework then
-    if Shared.Framework == "ESX" then
-        Framework = nil
-        TriggerEvent('esx:getSharedObject', function(obj) Framework = obj end)
-    else
-        Framework = nil
-        TriggerEvent('QBCore:GetObject', function(obj) Framework = obj end)
+-- if Shared.OldFramework then
+--     if Shared.Framework == "ESX" then
+--         Framework = nil
+--         TriggerEvent('esx:getSharedObject', function(obj) Framework = obj end)
+--     else
+--         Framework = nil
+--         TriggerEvent('QBCore:GetObject', function(obj) Framework = obj end)
+--     end
+-- end
+
+Citizen.CreateThread(function()
+    if not Shared.OldFramework then
+        if Framework == nil then
+            ESX = exports["es_extended"]:getSharedObject()
+            QBCore = exports["qb-core"]:GetCoreObject()
+            if ESX == nil then
+                Framework = QBCore 
+            else
+                Framework = ESX
+            end
+        end
     end
-end
+end)
+
 
 function KIBRA.Natives.CreateCallback(name, cb)
     KIBRA.ServerCallbacks[name] = cb
