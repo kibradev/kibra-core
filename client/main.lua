@@ -6,24 +6,37 @@ KIBRA.Natives.UI = {}
 KIBRA.CurrentRequestId = 0 
 local playerData = {}
 
-if Shared.OldFramework then
-    if Shared.Framework == "ESX" then
-        Citizen.CreateThread(function()
-            while Framework == nil do
-                TriggerEvent('esx:getSharedObject', function(obj) Framework = obj end)
-                Citizen.Wait(5000)
-            end
-        end)
-    else
-        Citizen.CreateThread(function()
-            while Framework == nil do
-                TriggerEvent('QBCore:GetObject', function(obj) Framework = obj end)
-                Citizen.Wait(5000)
-            end
-        end)
-    end
-end
+-- if Shared.OldFramework then
+--     if Shared.Framework == "ESX" then
+--         Citizen.CreateThread(function()
+--             while Framework == nil do
+--                 TriggerEvent('esx:getSharedObject', function(obj) Framework = obj end)
+--                 Citizen.Wait(5000)
+--             end
+--         end)
+--     else
+--         Citizen.CreateThread(function()
+--             while Framework == nil do
+--                 TriggerEvent('QBCore:GetObject', function(obj) Framework = obj end)
+--                 Citizen.Wait(5000)
+--             end
+--         end)
+--     end
+-- end
 
+Citizen.CreateThread(function()
+    if not Shared.OldFramework then
+        if Framework == nil then
+            ESX = exports["es_extended"]:getSharedObject()
+            QBCore = exports["qb-core"]:GetCoreObject()
+            if ESX == nil then
+                Framework = QBCore 
+            else
+                Framework = ESX
+            end
+        end
+    end
+end)
 function KIBRA.Natives.GetPlayerData()
 
     if Shared.Framework == "ESX" then
