@@ -226,7 +226,7 @@ function KIBRA.Natives.GetPlayerFromIdentifier(identifier)
     if Shared.Framework == "ESX" then
         local source = Framework.GetPlayerFromIdentifier(identifier)
         if source then
-            return source
+            return source.source
         end
     else
         return Framework.Functions.GetPlayerByCitizenId(identifier).PlayerData.source
