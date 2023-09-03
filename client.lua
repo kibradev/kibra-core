@@ -82,20 +82,24 @@ function KIBRA.Natives.GetVehicleInDirection()
     return nil
 end
 
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function(xPlayer)
     KIBRA.PlayerData = xPlayer
 	KIBRA.PlayerLoaded = true
 end)
 
+RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)
 	KIBRA.PlayerLoaded = false
 	KIBRA.PlayerData = xPlayer
 end)
 
+RegisterNetEvent('esx:setJob')
 AddEventHandler("esx:setJob", function(job)
 	KIBRA.PlayerData.job = job
 end)
 
+RegisterNetEvent('QBCore:Client:OnJobUpdate')
 AddEventHandler("QBCore:Client:OnJobUpdate", function(job)
 	KIBRA.PlayerData.job = job
 end)

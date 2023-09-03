@@ -1,6 +1,6 @@
 Shared = {}
 
-Shared.Framework = "QBCore" -- or "QBCore "
+Shared.Framework = "ESX" -- or "QBCore "
 
 Shared.Notify = "default" -- or "okok" (okokNotify)
 
