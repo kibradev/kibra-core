@@ -13,6 +13,12 @@ KIBRA.ServerCallbacks = {}
 --     end
 -- end
 
+if GetResourceState('es_extended') ~= 'missing' then
+    Shared.Framework = 'ESX' 
+else
+    Shared.Framework = 'QBCore'
+end
+
 Citizen.CreateThread(function()
     if not Shared.OldFramework then
         if Framework == nil then
