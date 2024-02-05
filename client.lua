@@ -6,6 +6,12 @@ KIBRA.Natives.UI = {}
 KIBRA.CurrentRequestId = 0 
 local playerData = {}
 
+if GetResourceState('es_extended') ~= 'missing' then
+    Shared.Framework = 'ESX' 
+else
+    Shared.Framework = 'QBCore'
+end
+
 if Shared.OldFramework then
     if Shared.Framework == "ESX" then
         Citizen.CreateThread(function()
@@ -82,27 +88,27 @@ function KIBRA.Natives.GetVehicleInDirection()
     return nil
 end
 
--- RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
--- AddEventHandler('QBCore:Client:OnPlayerLoaded', function(xPlayer)
---     KIBRA.PlayerData = xPlayer
--- 	KIBRA.PlayerLoaded = true
--- end)
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+    KIBRA.PlayerData = Framework.Functions.GetPlayerData()
+	KIBRA.PlayerLoaded = true
+end)
 
--- RegisterNetEvent('esx:playerLoaded')
--- AddEventHandler('esx:playerLoaded', function(xPlayer)
--- 	KIBRA.PlayerLoaded = false
--- 	KIBRA.PlayerData = xPlayer
--- end)
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded', function(xPlayer)
+	KIBRA.PlayerLoaded = false
+	KIBRA.PlayerData = xPlayer
+end)
 
--- RegisterNetEvent('esx:setJob')
--- AddEventHandler("esx:setJob", function(job)
--- 	KIBRA.PlayerData.job = job
--- end)
+RegisterNetEvent('esx:setJob')
+AddEventHandler("esx:setJob", function(job)
+	KIBRA.PlayerData.job = job
+end)
 
--- RegisterNetEvent('QBCore:Client:OnJobUpdate')
--- AddEventHandler("QBCore:Client:OnJobUpdate", function(job)
--- 	KIBRA.PlayerData.job = job
--- end)
+RegisterNetEvent('QBCore:Client:OnJobUpdate')
+AddEventHandler("QBCore:Client:OnJobUpdate", function(job)
+	KIBRA.PlayerData.job = job
+end)
 
 RegisterNetEvent('kibra:serverCallback', function(requestId,invoker, ...)
     if KIBRA.ServerCallbacks[requestId] then
