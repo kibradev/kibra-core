@@ -1,5 +1,11 @@
 Framework = nil 
 
+if GetResourceState('es_extended') ~= 'missing' then
+    Shared.Framework = 'ESX' 
+else
+    Shared.Framework = 'QBCore'
+end
+
 if not Shared.OldFramework then
     if Shared.Framework == "ESX" then
         Framework = exports["es_extended"]:getSharedObject()
