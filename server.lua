@@ -22,11 +22,11 @@ end
 Citizen.CreateThread(function()
     if not Shared.OldFramework then
         if Framework == nil then
-            ESX = exports["es_extended"]:getSharedObject()
-            QBCore = exports["qb-core"]:GetCoreObject()
             if ESX == nil then
                 Framework = QBCore 
+		QBCore = exports["qb-core"]:GetCoreObject()
             else
+		ESX = exports["es_extended"]:getSharedObject()
                 Framework = ESX
             end
         end
